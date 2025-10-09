@@ -66,3 +66,5 @@ hero:
 </StackH>
 
 <HomeGallery />
+
+<CursorFish />

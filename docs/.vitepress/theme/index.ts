@@ -6,6 +6,7 @@ import "./style.css";
 import GoFishVue from "../../../components/GoFishVue.vue";
 import ExampleGallery from "../../../components/ExampleGallery.vue";
 import HomeGallery from "../../../components/HomeGallery.vue";
+import CursorFish from "../../../components/CursorFish.vue";
 import { Sandbox } from "vitepress-plugin-sandpack";
 import "vitepress-plugin-sandpack/dist/style.css";
 import { StarfishLive } from "../../../components/StarfishLive";
@@ -20,6 +21,7 @@ export default {
     app.component("GoFishVue", GoFishVue);
     app.component("ExampleGallery", ExampleGallery);
     app.component("HomeGallery", HomeGallery);
+    app.component("CursorFish", CursorFish);
     app.component("Sandbox", Sandbox);
     app.component("StarfishLive", StarfishLive);
   },
