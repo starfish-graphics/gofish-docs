@@ -1,6 +1,13 @@
 # Horizontal Bar Chart
 
-::: starfish example:horizontal-bar-chart
+::: starfish example:horizontal-bar-chart hidden
+
+```ts
+gf.chart(seafood, { w: 500, h: 300 })
+  .flow(spread("lake", { dir: "y" }))
+  .mark(rect({ w: "count" }))
+  .render(root);
+```
 
 **Live Editor**
 

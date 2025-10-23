@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: GoFish Graphics
-  text: "JavaScript Charts Without the Headache"
+  text: "Charts w/o headaches"
   tagline: More simple. More beautiful. More expressive. More.
   image:
     src: /gofish-logo.png

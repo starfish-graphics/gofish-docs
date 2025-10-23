@@ -2,6 +2,13 @@
 
 ::: starfish example:stacked-bar-chart
 
+```ts
+gf.chart(seafood, { w: 500, h: 300 })
+  .flow(spread("lake", { dir: "x" }), stack("species", { dir: "y" }))
+  .mark(rect({ h: "count", fill: "species" }))
+  .render(root);
+```
+
 **Live Editor**
 
 ::: starfish-live {template=vanilla-ts rtl lightTheme=aquaBlue darkTheme=atomDark previewHeight=400 coderHeight=512}

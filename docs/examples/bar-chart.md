@@ -1,10 +1,18 @@
 # Bar Chart
 
-::: starfish example:bar-chart
+::: starfish example:bar-chart hidden
+
+```ts
+gf.data(seafood, { w: 500, h: 300 })
+  .flow(spread("lake", { dir: "x" }))
+  .mark(rect({ h: "count" }))
+  .render(root);
+```
 
 **Live Editor**
 
-::: starfish-live {template=vanilla-ts rtl lightTheme=aquaBlue darkTheme=atomDark previewHeight=400 coderHeight=512}
+::: starfish-live {template=vanilla-ts rtl lightTheme=aquaBlue darkTheme=atomDark previewHeight=400
+coderHeight=512}
 
 ```ts index.ts
 import { StackX, Rect, For, v } from "gofish-graphics";
