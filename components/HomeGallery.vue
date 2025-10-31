@@ -33,16 +33,27 @@ onMounted(() => {
 <style scoped>
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(6, 1fr);
+  /* gap: 12px; */
   margin-top: -20px;
+  width: 90vw;
+  /* align content of grid block to center */
+  justify-content: center;
+  /* center the entire grid block */
+  /* margin-left: auto; */
+  /* margin-right: auto; */
+  /* width: 100%; */
+  /* max-width: 1400px; */
+  border: 1px solid #4cb05e;
+  border-radius: 8px;
 }
 
 .example-card {
-  border: 1px solid var(--vp-c-border);
-  border-radius: 8px;
+  /* border-bottom: 1px solid var(--vp-c-border); */
+  /* border-right: 1px solid #4cb05e; */
+  /* border-radius: 8px; */
   overflow: hidden;
-  background: var(--vp-c-bg);
+  /* background: var(--vp-c-bg); */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -62,7 +73,8 @@ onMounted(() => {
   position: relative;
   aspect-ratio: 16/10;
   overflow: hidden;
-  background: var(--vp-c-bg-soft);
+  /* background: var(--vp-c-bg-soft); */
+  background: #4cb05e08;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,7 +94,7 @@ onMounted(() => {
 }
 
 .card-content {
-  padding: 16px;
+  padding: 8px;
   font-weight: 400;
 }
 
