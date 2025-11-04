@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { chart, spread, stack, derive, layer, select, rect, area, foreach, clock } from 'gofish-graphics'
-import { orderBy } from 'lodash'
+import _ from 'lodash'
+const { orderBy } = _
 
 const rootEl = ref<HTMLElement | null>(null)
 const copied = ref(false)
