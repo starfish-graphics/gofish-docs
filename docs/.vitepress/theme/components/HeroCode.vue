@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
-import { rect, polar } from 'gofish-graphics'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { chart, spread, stack, derive, layer, select, rect, area, foreach, clock } from 'gofish-graphics'
 import { orderBy } from 'lodash'
 
 const rootEl = ref<HTMLElement | null>(null)
 const copied = ref(false)
 const installCmd = 'npm install gofish-graphics'
+const chartWidth = ref(500)
+const chartHeight = ref(300)
 
 const seafood = [
   { lake: 'Lake A', species: 'Bass', count: 23 },
@@ -40,19 +42,25 @@ const seafood = [
   { lake: 'Lake F', species: 'Salmon', count: 47 }
 ]
 
-const code = `rect(seafood, { h: "count", fill: "species" })
-  .stackY("species", { reverse: true })
-  .transform((d) => orderBy(d, "count", "desc"))
-  .spreadX("lake", {
-    y: 50,
-    x: (-3 * Math.PI) / 6,
-    spacing: (2 * Math.PI) / 6,
-    alignment: "start",
-    mode: "center",
-  })
-  .connectX("species", { over: "lake", opacity: 0.8 })
-  .coord(polar())
-  .render(root, { w: 500, h: 300, transform: { x: 200, y: 150 } });`
+const code = `layer({ coord: clock() }, [
+  chart(seafood)
+    .flow(
+      spread("lake", {
+        dir: "x",
+        spacing: (2 * Math.PI) / 6,
+        mode: "center",
+        y: 50,
+        label: false,
+      }),
+      derive((d) => orderBy(d, "count", "asc")),
+      stack("species", { dir: "y", label: false })
+    )
+    .mark(rect({ w: 0.1, h: "count", fill: "species" }))
+    .as("bars"),
+  chart(select("bars"))
+    .flow(foreach("species"))
+    .mark(area({ opacity: 0.8 })),
+]).render(root, { w: 500, h: 300, transform: { x: 200, y: 200 }, axes: true });`
 
 function escapeHtml(src: string): string {
   return src
@@ -82,23 +90,88 @@ function highlightTs(src: string): string {
 
 const highlighted = computed(() => highlightTs(code))
 
-onMounted(() => {
+function updateChartDimensions() {
   const root = rootEl.value
   if (!root) return
+  
+  // Get the actual container width, including padding
+  const container = root.parentElement
+  const containerWidth = container 
+    ? Math.min(container.clientWidth - 16, 640) // Subtract padding
+    : Math.min(window.innerWidth - 32, 640) // Fallback with margin
+  
+  // Use container width, ensuring it's at least 300px for very small screens
+  const availableWidth = Math.max(containerWidth, 300)
+  
+  // Maintain aspect ratio (500:300 = 5:3)
+  chartWidth.value = availableWidth
+  chartHeight.value = (availableWidth * 300) * 0.8 / 500
+  
+  // Re-render chart with new dimensions
   root.innerHTML = ''
-  rect(seafood, { h: 'count', fill: 'species' })
-    .stackY('species', { reverse: true })
-    .transform((d) => orderBy(d, 'count', 'desc'))
-    .spreadX('lake', {
-      y: 50,
-      x: (-3 * Math.PI) / 6,
-      spacing: (2 * Math.PI) / 6,
-      alignment: 'start',
-      mode: 'center'
-    })
-    .connectX('species', { over: 'lake', opacity: 0.8 })
-    .coord(polar())
-    .render(root, { w: 500, h: 300, transform: { x: 200, y: 150 } })
+  const centerX = chartWidth.value / 2
+  const centerY = chartHeight.value / 2
+  
+  layer({ coord: clock() }, [
+    chart(seafood)
+      .flow(
+        spread('lake', {
+          dir: 'x',
+          spacing: (2 * Math.PI) / 6,
+          mode: 'center',
+          y: 50,
+          label: false,
+        }),
+        derive((d) => orderBy(d, 'count', 'asc')),
+        stack('species', { dir: 'y', label: false })
+      )
+      .mark(rect({ w: 0.1, h: 'count', fill: 'species' }))
+      .as('bars'),
+    chart(select('bars'))
+      .flow(foreach('species'))
+      .mark(area({ opacity: 0.8 })),
+  ]).render(root, { 
+    w: chartWidth.value, 
+    h: chartHeight.value, 
+    transform: { x: centerX, y: centerY }, 
+    axes: true 
+  })
+  
+  // Ensure SVG is constrained to container width
+  const svg = root.querySelector('svg')
+  if (svg) {
+    svg.style.width = '100%'
+    svg.style.height = 'auto'
+    svg.style.maxWidth = `${chartWidth.value}px`
+  }
+}
+
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  // Wait for next tick to ensure container is properly sized
+  setTimeout(() => {
+    updateChartDimensions()
+    
+    // Observe container size changes - observe parent container for better width detection
+    const container = rootEl.value?.parentElement
+    if (container && window.ResizeObserver) {
+      resizeObserver = new ResizeObserver(() => {
+        updateChartDimensions()
+      })
+      resizeObserver.observe(container)
+    }
+    
+    // Fallback for browsers without ResizeObserver
+    window.addEventListener('resize', updateChartDimensions)
+  }, 0)
+})
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
+  window.removeEventListener('resize', updateChartDimensions)
 })
 
 async function copyInstall() {
@@ -146,6 +219,7 @@ async function copyInstall() {
 }
 
 .install-pill {
+  display: block;
   font-weight: 700;
   font-family: var(--vp-font-family-mono);
   font-size: 12px;
@@ -154,6 +228,10 @@ async function copyInstall() {
   border-radius: 4px;
   margin-left: 0.25rem;
   display: inline-flex;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.05s ease;
+  /* width: 100%; */
+  width: 100%;
+  margin-top: 2rem;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
@@ -163,8 +241,8 @@ async function copyInstall() {
   cursor: pointer;
   user-select: none;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.05s ease;
-  width: 100%;
   justify-content: space-between;
+  margin-top: 2rem;
 }
 
 .install-pill:hover {
@@ -188,9 +266,30 @@ async function copyInstall() {
 
 .viz {
   width: 100%;
-  height: 400px;
+  max-width: 640px;
+  aspect-ratio: 5 / 3;
   border-radius: 12px;
   display: block;
+  overflow: hidden;
+}
+
+.viz :deep(svg) {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+}
+
+@media (max-width: 640px) {
+  .viz {
+    aspect-ratio: 5 / 3;
+    height: auto;
+    max-width: 100%;
+  }
+  
+  .viz :deep(svg) {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 
 .code {

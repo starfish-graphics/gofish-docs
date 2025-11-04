@@ -35,8 +35,8 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   /* gap: 12px; */
-  margin-top: -20px;
-  width: 90vw;
+  /* margin-top: -20px; */
+  width: 85vw;
   /* align content of grid block to center */
   justify-content: center;
   /* center the entire grid block */
@@ -48,6 +48,17 @@ onMounted(() => {
   border-radius: 8px;
 }
 
+/* on mobile, make the grid a single column and remove magins */
+@media (max-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    margin-top: 500px !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    width: 70vw !important;
+  }
+}
+
 .example-card {
   /* border-bottom: 1px solid var(--vp-c-border); */
   /* border-right: 1px solid #4cb05e; */
@@ -55,6 +66,7 @@ onMounted(() => {
   overflow: hidden;
   /* background: var(--vp-c-bg); */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* important to override the margin-left: 0; padding-left: 0; in the GoFishVue component */
 }
 
 .example-card:hover {
