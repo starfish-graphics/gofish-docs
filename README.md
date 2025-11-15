@@ -1,3 +1,7 @@
+# ⚠️ This repo has been merged into the code repo! ⚠️
+
+Please go to https://github.com/starfish-graphics/gofish-graphics/tree/main/apps/docs for the documenation source code.
+
 # Starfish Graphics
 
 A graphics library with interactive documentation featuring a live code sandbox.
